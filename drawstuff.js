@@ -313,6 +313,36 @@ function interpRect(imagedata,top,bottom,left,right,globals,tlAttribs,trAttribs,
         difColor.g = attribs.diffuse.g * globals.lightCol.g/255 * NdotL;
         difColor.b = attribs.diffuse.b * globals.lightCol.b/255 * NdotL;
         
+        //Ambient lighting
+        var ambientStrength = 0.2;
+        
+        difColor.r += attribs.diffuse.r * ambientStrength;
+        difColor.g += attribs.diffuse.g * ambientStrength;
+        difColor.b += attribs.diffuse.b * ambientStrength;
+        
+        //Specular lighting
+        var viewDir = new Vector(0,0,1);
+        
+        var reflectDir = Vector.subtract(
+            Vector.scale(2 * Vector.dot(new Vector(0,0,1),lVect),new Vector (0,0,1)),lVect
+        );
+        reflectDir = Vector.normalize(reflectDir);
+        
+        var specAngle = Vector.dot(viewDir,reflectDir);
+        var shininess = 32;
+        var specularStrength = 0.8;
+        
+        var specular = specularStrength * Math.pow(specAngle,shininess);
+        difColor.r += 255 * specular;
+        difColor.g += 255 * specular;
+        difColor.b += 255 * specular;
+        
+        //Keep color within bounds
+        difColor.r = Math.min(255,difColor.r);
+        difColor.g = Math.min(255,difColor.g);
+        difColor.b = Math.min(255,difColor.b);
+
+        
         drawPixel(imagedata,pixX,pixY,difColor);
     } // end shade pixel
     
